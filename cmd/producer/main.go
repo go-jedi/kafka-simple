@@ -2,8 +2,10 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/IBM/sarama"
+	"fmt"
 	"log"
+
+	"github.com/IBM/sarama"
 )
 
 type MyMessage struct {
@@ -15,16 +17,10 @@ type MyMessage struct {
 func main() {
 	producer, err := sarama.NewSyncProducer([]string{"127.0.0.1:9095"}, nil)
 	if err != nil {
-		log.Fatalf("Failed to create producer: %v", err)
+		log.Fatalf("failed to create producer: %v", err)
 		return
 	}
-	defer func(producer sarama.SyncProducer) {
-		err := producer.Close()
-		if err != nil {
-			log.Println(err)
-			return
-		}
-	}(producer)
+	defer producer.Close()
 
 	message := MyMessage{
 		ID:    1,
@@ -43,9 +39,11 @@ func main() {
 		Value: sarama.ByteEncoder(bytes),
 	}
 
-	_, _, err = producer.SendMessage(msg)
+	partition, offset, err := producer.SendMessage(msg)
 	if err != nil {
 		log.Println(err)
 		return
 	}
+
+	fmt.Printf("message sent to partition %d at offset %d\n", partition, offset)
 }
