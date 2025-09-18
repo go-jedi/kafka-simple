@@ -15,7 +15,7 @@ type MyMessage struct {
 }
 
 func main() {
-	producer, err := sarama.NewSyncProducer([]string{"127.0.0.1:9095"}, nil)
+	producer, err := sarama.NewSyncProducer([]string{"127.0.0.1:9092"}, nil)
 	if err != nil {
 		log.Fatalf("failed to create producer: %v", err)
 		return
