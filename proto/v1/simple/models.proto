@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package user;
+
+option go_package = "github.com/go-jedi/go-kafka-test/proto/v1/simple/models";
+
+import "github.com/alta/protopatch/patch/go.proto";
+
+message Simple {
+  int64 id = 1 [(go.field).tags = 'json:"id"'];
+  string message = 2 [(go.field).tags = 'json:"message"'];
+}
+
+//
+// CREATE
+//
+
+message CreateDTO {
+  int64 id = 1 [(go.field).tags = 'json:"id" validate:"required,gt=0"'];
+  string message = 2 [(go.field).tags = 'json:"message" validate:"required,min=1"'];
+}

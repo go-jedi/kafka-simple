@@ -1,6 +1,50 @@
 package main
 
 import (
+	"log"
+
+	"github.com/IBM/sarama"
+	models "github.com/go-jedi/go-kafka-test/proto/v1/simple"
+	"google.golang.org/protobuf/proto"
+)
+
+func main() {
+	consumer, err := sarama.NewConsumer([]string{"127.0.0.1:9092"}, nil)
+	if err != nil {
+		log.Fatalf("failed to create consumer: %v", err)
+	}
+	defer consumer.Close()
+
+	partConsumer, err := consumer.ConsumePartition("topic-1", 0, sarama.OffsetNewest)
+	if err != nil {
+		log.Fatalf("failed to consume partition: %v", err)
+	}
+	defer partConsumer.Close()
+
+	for {
+		select {
+		case msg, ok := <-partConsumer.Messages():
+			if !ok {
+				log.Println("channel closed, exiting")
+				return
+			}
+
+			var receivedMessage models.CreateDTO
+			if err := proto.Unmarshal(msg.Value, &receivedMessage); err != nil {
+				log.Printf("error unmarshaling JSON: %v\n", err)
+				continue
+			}
+
+			log.Printf("received message: %+v\n", receivedMessage)
+		}
+	}
+}
+
+/*
+TODO: с использованием JSON:
+package main
+
+import (
 	"encoding/json"
 	"log"
 
@@ -44,3 +88,4 @@ func main() {
 		}
 	}
 }
+*/

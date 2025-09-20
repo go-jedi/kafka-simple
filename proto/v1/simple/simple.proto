@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package user;
+
+option go_package = "github.com/go-jedi/go-kafka-test/proto/v1/simple/models";
+
+import "github.com/alta/protopatch/patch/go.proto";
+import "proto/v1/simple/models.proto";
+
+service SimpleService {
+  rpc Create(CreateDTO) returns(Simple);
+}
